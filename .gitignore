@@ -1,0 +1,36 @@
+# Dependencies - ignore node_modules in ALL folders
+node_modules/
+**/node_modules/
+
+# Environment variables - ignore .env files in ALL folders
+.env
+**/.env
+.env.local
+**/.env.local
+.env.development.local
+**/.env.development.local
+.env.test.local
+**/.env.test.local
+.env.production.local
+**/.env.production.local
+
+# dependencies (additional)
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+**/build
+/dist
+**/dist
+
+# misc
+.DS_Store
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
