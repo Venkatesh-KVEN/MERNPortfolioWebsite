@@ -18,18 +18,15 @@ const LatestProjects = () => {
     }
 
     const { projects =[]} = portfolioData || [];
+
     const sortedProjects = [...projects].sort((a, b) => {
-    const dateA = a?.createdAt ? new Date(a.createdAt) : new Date(0);
-    const dateB = b?.createdAt ? new Date(b.createdAt) : new Date(0);
-          if (isNaN(dateA) && isNaN(dateB)) return 0;
-          if (isNaN(dateA)) return 1; 
-          if (isNaN(dateB)) return -1;
-    return dateB - dateA;
-    });    
+    return (a.order ?? 0) - (b.order ?? 0);
+    });
     
     const latestTwo = sortedProjects.slice(0, 2);
+    const otherProjects = sortedProjects.slice(2);
     const initialLimit=3;
-    const itemsToShow=showAll?sortedProjects:sortedProjects.slice(0, initialLimit);
+    const itemsToShow=showAll?otherProjects:otherProjects.slice(0, initialLimit);
     const handleToggleShow=()=>{    
         setShowAll(prev=>!prev)
     }   
@@ -118,7 +115,7 @@ const LatestProjects = () => {
                     <div className='row'>
                         <div className="d-flex justify-content-center pb-5">
                         <button type="button" className="btn custom-btn btn-outline-success btn-sm" onClick={handleToggleShow}>
-                           View All
+                          {showAll ? "Show Less" : "View All"}
                         </button>
                         </div>
                     </div>

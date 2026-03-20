@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import session from 'express-session';
-import AdminJS from 'adminjs';
+import AdminJS, { actions } from 'adminjs';
 import AdminJSExpress from '@adminjs/express';
 import uploadFeature from '@adminjs/upload';
 import * as AdminJSMongoose from '@adminjs/mongoose';
@@ -14,14 +14,15 @@ import {SocialLink} from './models/SocialLinks.js';
 import {CoreSkills} from './models/coreSkills.js';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
-dotenv.config();
+dotenv.config();  
 
 
 import Projects from './models/Porjects.js';
 import authRoutes from './routes/authRoutes.js';
+import projectOrderRouter from './routes/admin.routes.js';
 import protfolioRouter from './routes/protfolio.js';
 
-import { ComponentLoader } from 'adminjs';
+import componentLoader from './admin/component-loader.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -64,8 +65,8 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Initialize ComponentLoader
-const componentLoader = new ComponentLoader();
+// // Initialize ComponentLoader
+// const componentLoader = new ComponentLoader();
 
 // Configure upload feature
 const uploadFeatureConfig = uploadFeature({
@@ -137,6 +138,15 @@ const adminOptions = {
             isVisible: { list: false, show: true, edit: false } 
           },
         },
+        sort:{
+          sortBy:'order',
+          direction:'asc'
+        },
+        actions:{
+          list: {
+          component: 'DraggableList',
+      },
+        }
       },
       features: [uploadFeatureConfig],
     },
@@ -250,6 +260,22 @@ app.use(express.urlencoded({ extended: true }));
 
 // Auth routes (separate from AdminJS)
 app.use('/api/auth', authRoutes);
+app.use('/project/order', projectOrderRouter);
+
+app.delete('/api/project/:id', async (req, res) => {
+  try {
+    const deleted = await Projects.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'Project not found' });
+    }
+
+    res.json({ success: true, message: 'Deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false });
+  }
+});
 
 // Regular routes come after body-parser
 app.get('/', (req, res) => {
@@ -374,6 +400,7 @@ app.get('/reset-password/:token', (req, res) => {
     </html>
   `);
 });
+
 
 
 // 7. Error handling middleware (always last)

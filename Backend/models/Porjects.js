@@ -7,6 +7,11 @@ const projectSchema = new mongoose.Schema({
   imageKey: String,     
   imageMimeType: String,  
   imageSize: Number, 
+  order:{
+    type:Number,
+    default:0,
+    index:true
+  },
   technologies: [{
         type: String,
         trim: true
