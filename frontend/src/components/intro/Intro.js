@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { ReactTyped } from "react-typed";
 import '../intro/intro.css';
 
 function Intro() {
@@ -16,9 +15,8 @@ function Intro() {
     
     const { intro, socialLink } = portfolioData;
     const { firstName, captions, description, welcomeText } = intro || {};
-    
-    // Process captions - split by comma or create array from string
-    const captionArray = captions ? captions.split(',').map(item => item.trim()) : ['Developer', 'Designer', 'Creator'];
+    console.log(captions)
+    // const captionArray = captions ? captions.split(',').map(item => item.trim()) : ['Developer', 'Designer', 'Creator'];
     
     return (
         <div className="bg-dark text-secondary px-4 py-5 text-center heroGredBackground pt-5 d-flex justify-content-center align-items-center" id="home">
@@ -27,25 +25,17 @@ function Intro() {
                 <h1 className="display-3 fw-normal text-white" data-aos="fade-up" data-aos-easing="ease-in-sine">{firstName}</h1>
                 <div data-aos="fade-up" data-aos-easing="ease-in-sine">
                     <div className='intro-typed-text-one'>
-                       <span className='hero-title-gradient-text' >I'm a</span> {' '}
-                        <ReactTyped
-                            strings={captionArray}
-                            typeSpeed={100}
-                            backSpeed={50}
-                            loop={true}
-                            backDelay={1000}
-                            startDelay={500}
-                            smartBackspace={true}
-                            showCursor={true}
-                            cursorChar="|"
-                            onStringTyped={(index) => setCurrentIndex(index)}
-                            className={`hero-title-gradient-text hero-title-gradient-text-${currentIndex}`}
-                        />
+                       <span className='hero-title-gradient-text pe-2'>I'm a</span>
+                        {(typeof captions === 'string' ? captions.split(',').map(s => s.trim()) : captions || [])?.map?.((text, index) => (
+                        <span key={index} className={`hero-title-gradient-text pe-2 hero-title-gradient-text-${index}`}>
+                            {text}
+                        </span>
+                        ))}
                     </div>
                 </div>
                                     
                 <div className="col-lg-12 mx-auto mt-3">
-                    <p className="fs-5 mb-4" data-aos="fade-up" data-aos-easing="ease-in-sine">{description}</p>
+                    <p className="fs-6 mb-4 w-50 mx-auto text-center" data-aos="fade-up" data-aos-easing="ease-in-sine">{description}</p>
                     <div className="d-grid gap-2 d-sm-flex justify-content-sm-center align-items-center">
                         <a href='#projects' className="btn btn-primary btn-sm custom-into-btn py-2" data-aos="zoom-in" data-aos-easing="ease-in-sine">View My Work</a>
                         <div className='social-icons-wrapper'>

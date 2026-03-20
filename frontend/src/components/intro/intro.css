@@ -16,7 +16,7 @@ span.hero-title-gradient-text{
     -webkit-text-fill-color: transparent;
 }
 
-span.hero-title-gradient-text-2 {
+span.hero-title-gradient-text-0 {
     font-size: 2rem;
     background: -webkit-linear-gradient(280deg, #00d393, #4fa4ff);
     -webkit-background-clip: text;
@@ -30,7 +30,7 @@ span.hero-title-gradient-text-1{
     -webkit-text-fill-color: transparent;
 }
 
-span.hero-title-gradient-text-0 {
+span.hero-title-gradient-text-2 {
     font-size: 2rem;
     background: -webkit-linear-gradient(280deg, #c27aff, #bf4e8f);
     -webkit-background-clip: text;
