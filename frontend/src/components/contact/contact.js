@@ -202,7 +202,7 @@ const ContactForm = () => {
                                         </div>
                                     )}
                                     
-                                    <form onSubmit={handleSubmit} noValidate className="mb-5" name="contactForm">
+                                    <form onSubmit={handleSubmit} noValidate className="contact-form mb-5" name="contactForm">
                                         <div className="row mb-3">
                                             <div className="col">
                                                 <input

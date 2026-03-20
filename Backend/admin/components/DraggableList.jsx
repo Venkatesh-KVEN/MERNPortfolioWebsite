@@ -154,7 +154,7 @@ const handleDelete = async (id) => {
                         {/* CONTENT */}
                         <Box flex="1">
                           <Text fontWeight="bold">
-                            #{record?.params?.order ?? 0} — {record?.params?.title}
+                            #{(record?.params?.order ?? 0)+1} — {record?.params?.title}
                           </Text>
 
                           <Text variant="sm" color="grey">

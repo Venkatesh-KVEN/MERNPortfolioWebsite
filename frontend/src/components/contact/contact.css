@@ -8,6 +8,9 @@
     border-color: #576f72 !important;
     border-width: 1px;
 }
+.contact-card .form-control::placeholder {
+    color: #576f72  !important;
+}
 
 .contact-card .form-control:focus {
     box-shadow: 0 0 0 .25rem rgba(0, 118, 125, .25) !important;
@@ -58,4 +61,8 @@ a.custom-icon-btn:hover{
 .phone-link:hover {
   background-color: rgba(255, 255, 255, 0.1);
   text-decoration: underline !important;
+}
+
+.contact-form input.control-form::placeholder{
+    color: rgb(60, 101, 130) !important;
 }

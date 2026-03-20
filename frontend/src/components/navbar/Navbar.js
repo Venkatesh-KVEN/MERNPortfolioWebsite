@@ -5,11 +5,14 @@ import { Navbar, Container, Nav, Offcanvas} from 'react-bootstrap';
 import BlockLogo from '../../assets/logo-block.jpeg';
 import WhiteLogo from '../../assets/logo.jpeg';
 
+import axios from 'axios'
+
 
 function AppNavbar() {
     const expand = 'lg'; // Or 'sm', 'md', 'xl', 'xxl', or false
     const [navbarLogo, setNavbarLogo]=useState(WhiteLogo)
-    const [navbar, setNavbar]=useState(false);  
+    const [navbar, setNavbar]=useState(false); 
+    const [resumeId, setResumeId]=useState(null) 
 
     const changeBackground=()=>{
       // console.log(window.scrollY)
@@ -40,7 +43,32 @@ function AppNavbar() {
     window.addEventListener("scroll", changeLogo)
   })
 
+  const downloadResume = async (id) => {
+    try {
+      const res = await axios.get(`/api/resume/download/${id}`, {
+        responseType: 'blob',
+      })
 
+      const url = window.URL.createObjectURL(new Blob([res.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'My_Resume.pdf'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+    } catch (err) {
+     console.error('Download failed', err)
+    }
+  }
+
+   useEffect(() => {
+    const fetchResume = async () => {
+      const res = await axios.get('http://localhost:3000/api/resume')
+      setResumeId(res.data?._id)
+    }
+
+    fetchResume()
+  }, [])
   return (
    <Navbar key={expand} expand={expand} className={`mb-3 ${navbar ? 'navbar scrolled':'navbar'} navbar-expand-lg navbar-dark fixed-top`} id="main-nav">
       <Container>
@@ -65,6 +93,10 @@ function AppNavbar() {
               <Nav.Link href="#skills">Skills</Nav.Link>
               <Nav.Link href="#projects">Projects</Nav.Link>
               <Nav.Link href="#contact">Contact</Nav.Link>
+              <Nav.Link onClick={() => downloadResume(resumeId)}>
+                <i className="bi bi-download pe-1"></i>Resume
+              </Nav.Link>
+             
               {/* Add more Nav.Link or NavDropdown components as needed */}
             </Nav>
             {/* You can also place forms or other content here */}

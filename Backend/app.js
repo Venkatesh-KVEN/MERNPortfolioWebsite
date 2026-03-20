@@ -21,6 +21,7 @@ import Projects from './models/Porjects.js';
 import authRoutes from './routes/authRoutes.js';
 import projectOrderRouter from './routes/admin.routes.js';
 import protfolioRouter from './routes/protfolio.js';
+import resumeRoutes from './routes/resumeRoutes.js';
 
 import componentLoader from './admin/component-loader.js';
 import path from 'path';
@@ -31,6 +32,7 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit'; 
 import contactRoutes from './routes/contact.js';
 import { ContactInfo } from './models/contactInfo.js';
+import Resume from './models/Resume.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,6 +54,14 @@ const PORT = process.env.PORT || 3000;
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Resume subfolder
+// Resume subfolder
+const resumeDir = path.join(__dirname, 'public', 'uploads', 'resumes');
+
+if (!fs.existsSync(resumeDir)) {
+  fs.mkdirSync(resumeDir, { recursive: true });
 }
 
 // Register AdminJS adapter for Mongoose
@@ -97,6 +107,35 @@ const uploadFeatureConfig = uploadFeature({
   },
 });
 
+//resume upload configure
+const resumeUploadFeature = uploadFeature({
+  componentLoader,
+  provider: {
+    local: {
+      bucket: path.join(__dirname, 'public', 'uploads', 'resumes'),
+      opts: { baseUrl: '/uploads/resumes' },
+    },
+  },
+
+  // ✅ YOUR CODE GOES HERE
+  properties: {
+    file: 'uploadResume',   // 👈 this creates upload field in AdminJS
+    key: 'resumeKey',        // 👈 stored filename in DB
+    mimeType: 'mimeType',
+    size: 'size',
+  },
+
+  validation: { 
+    mimeTypes: ['application/pdf'],
+  },
+
+  uploadPath: (record, filename) => {
+    const timestamp = Date.now()
+    const random = Math.random().toString(36).substring(2, 10)
+    const ext = filename.substring(filename.lastIndexOf('.'))
+    return `${timestamp}-${random}${ext}`
+  },
+})
 
 // Configure AdminJS options
 const adminOptions = {
@@ -122,6 +161,27 @@ const adminOptions = {
     },
     {
       resource:SocialLink
+    },
+     {
+        resource: Resume,
+        options: {
+          properties: {
+            uploadResume: {
+              isVisible: { list: false, show: false, edit: true },
+            },
+
+            resumeKey: { isVisible: false },
+            mimeType: { isVisible: false },
+            size: { isVisible: false },
+
+            downloadUrl: {
+              isVisible: { list: true, show: true, edit: false },
+            },
+          },
+        },
+
+        // ✅ VERY IMPORTANT
+        features: [resumeUploadFeature],
     },
     {
       resource: Projects,
@@ -261,6 +321,7 @@ app.use(express.urlencoded({ extended: true }));
 // Auth routes (separate from AdminJS)
 app.use('/api/auth', authRoutes);
 app.use('/project/order', projectOrderRouter);
+app.use('/api/resume', resumeRoutes);
 
 app.delete('/api/project/:id', async (req, res) => {
   try {
