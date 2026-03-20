@@ -1,23 +1,16 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 import '../intro/intro.css';
 
 function Intro() {
-    // All Hooks must be called at the top level, before any conditional returns
-    const [currentIndex, setCurrentIndex] = useState(0);
-    
     const { portfolioData } = useSelector((state) => state.root);
-    
-    // Handle loading state with a simple check - but keep hooks above
+
     if (!portfolioData) {
         return <div className="loader">Loading Intro...</div>;
     }
     
     const { intro, socialLink } = portfolioData;
     const { firstName, captions, description, welcomeText } = intro || {};
-    console.log(captions)
-    // const captionArray = captions ? captions.split(',').map(item => item.trim()) : ['Developer', 'Designer', 'Creator'];
-    
     return (
         <div className="bg-dark text-secondary px-4 py-5 text-center heroGredBackground pt-5 d-flex justify-content-center align-items-center" id="home">
             <div className="py-5">
