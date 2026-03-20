@@ -7,7 +7,7 @@ import AppNavbar from './components/navbar/Navbar.js';
 import About from './components/about/about.js'; 
 import Footer from './components/footer/footer.js'; 
 import LatestProjects from './components/projects/projects.js'; 
-import TestSkills from './components/skills/testSkills.js'; 
+import TestSkills from './components/skills/testskills.js'
 import Contact from './components/contact/contact.js'; 
 
 import AOS from 'aos';
