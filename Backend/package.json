@@ -12,6 +12,7 @@
     "@adminjs/express": "^6.1.1",
     "@adminjs/mongoose": "^4.1.0",
     "@adminjs/upload": "^4.0.2",
+    "@tiptap/core": "^3.20.5",
     "adminjs": "^7.8.17",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
