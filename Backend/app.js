@@ -314,7 +314,7 @@ app.use(admin.options.rootPath, adminRouter);
 
 // NOW it's safe to add body-parser/express.json middleware AFTER AdminJS router
 app.set('trust proxy', 1);
-app.use(cors());
+app.use(cors({origin:'*'}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
