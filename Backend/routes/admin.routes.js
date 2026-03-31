@@ -4,7 +4,7 @@ import Projects from '../models/Porjects.js'
 
 const router = express.Router()
 
-router.post('/reorder-projects', async (req, res) => {
+router.post('/reorder-Projects', async (req, res) => {
   try {
 
     const { items } = req.body

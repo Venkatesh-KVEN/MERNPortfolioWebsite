@@ -70,3 +70,31 @@ a.custom-icon-btn:hover{
     background: #00bc7d !important;
     transform: translateY(-3px) !important;
 }
+.custom-intro-para{
+    width: 100% !important;
+}
+
+@media (min-width:1023px) {
+      .custom-intro-para{
+    width: 50% !important;
+}
+}
+@media (min-width:768px) {
+      .custom-intro-para{
+    width: 100%;
+}
+}
+@media (max-width: 767px) {
+  .custom-intro-para{
+    width: 100%;
+}
+/* } */
+/* @media (min-width: 360px) { */
+  .custom-intro-para{
+    width: 100%;
+}
+  .custom-intro-para p, p
+  {
+    text-align: justify !important;
+}
+}

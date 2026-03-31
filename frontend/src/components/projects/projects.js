@@ -6,6 +6,10 @@ const LatestProjects = () => {
     const [showAll, setShowAll]=useState(false)
     // Access the root state
     const { portfolioData } = useSelector((state) => state.root);
+      const { pageTitle, description, subTitle } =
+         portfolioData?.projectSection || {};
+
+        console.log(portfolioData?.projectSection);
     
     if (!portfolioData || !portfolioData.projects) {
         return (
@@ -35,10 +39,10 @@ const LatestProjects = () => {
             <section className="text-center container text-white" id="projects">
                 <div className="row py-lg-5 py-md-5 py-sm-5 py-5">
                     <div className="col-lg-6 col-md-8 mx-auto">
-                        <h1 className="fw-light" data-aos="fade-up" data-aos-easing="ease-in-sine">Featured Projects</h1>
+                        <h1 className="fw-light" data-aos="fade-up" data-aos-easing="ease-in-sine">{pageTitle}</h1>
                         <div className="gradient-bar mt-3" data-aos="fade-up" data-aos-easing="ease-in-sine"></div>
                         <p className="lead text-white mt-5" data-aos="fade-up" data-aos-easing="ease-in-sine">
-                            Explore my most recent work and technical experiments.
+                            {description}
                         </p>
                     </div>
                 </div>
@@ -58,10 +62,14 @@ const LatestProjects = () => {
                                         className='card-img'
                                         />
                                         <div className="card-img-overlay overlay">
-                                            <div className='d-flex justify-content-end'>        
-                                                <a href={project.projectUrl} target='_blank' rel="noreferrer" className="btn btn-dark rounded-circle">
+                                            <div className='d-flex justify-content-end'>     
+                                                {
+                                                    project.projectUrl && (                                                
+                                                    <a href={project.projectUrl} target='_blank' rel="noreferrer" className="btn btn-dark rounded-circle">
                                                     <i className="bi bi-link"></i>
-                                                </a>
+                                                    </a>)
+                                                }   
+
                                             </div>
                                         </div>
                                     </div>
@@ -82,7 +90,7 @@ const LatestProjects = () => {
                     </div>
 
                     {/* Other Projects Section */}
-                    <h3 className="fw-light pt-lg-5 pt-md-5 mt-5 text-center" data-aos="fade-up">Other Projects</h3>
+                    <h3 className="fw-bold pt-lg-5 pt-md-5 mt-5 text-center" data-aos="fade-up">{subTitle}</h3>
                     <div className="mt-2 row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 pb-3">
                         {itemsToShow.map((project, index) => (
                             <div key={project._id || index} className="col d-flex align-items-stretch">
@@ -90,10 +98,14 @@ const LatestProjects = () => {
                                     <div className="position-relative image-container">
                                         <img src={`${process.env.REACT_APP_API_URL}/uploads/${project.imageKey}`} alt={project.title} className='card-img'/>
                                         <div className="card-img-overlay overlay">
-                                            <div className='d-flex justify-content-end'>        
-                                                <a href={project.projectUrl} target='_blank' rel="noreferrer" className="btn btn-dark rounded-circle">
+                                            <div className='d-flex justify-content-end'> 
+                                                {
+                                                    project.projectUrl && (                                                
+                                                    <a href={project.projectUrl} target='_blank' rel="noreferrer" className="btn btn-dark rounded-circle">
                                                     <i className="bi bi-link"></i>
-                                                </a>
+                                                    </a>)
+                                                }       
+
                                             </div>
                                         </div>
                                     </div>

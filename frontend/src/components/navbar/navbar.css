@@ -41,3 +41,25 @@
 button.navbar-toggler.collapsed {
     background: #000;
 }
+.offcanvas {
+    max-width: 70% !important;
+}
+.custom-resume-link {
+  padding: 0.5rem 1rem !important;
+  font-size: 1rem !important;
+  background-color: #00bc7d !important;
+  border: 1px solid #00bc7d !important;
+  border-radius: 4px;
+  margin-left: 10px;
+  color: #fff !important;
+}
+
+.custom-resume-link:hover {
+  background-color: transparent !important;
+  color: #00bc7d;
+}
+@media (max-width: 767px) {
+a.navbar-brand {
+width: 50%;
+}
+}

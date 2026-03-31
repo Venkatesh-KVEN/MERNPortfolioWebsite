@@ -9,7 +9,9 @@ import { Message } from "../models/message.js";
 import { SocialLink } from "../models/SocialLinks.js";
 import { CoreSkills } from "../models/coreSkills.js";
 import User from "../models/User.js";
-import { ContactInfo } from "../models/contactInfo.js";
+import ProjectSection from "../models/ProjectSection.js";
+import SkillSection from "../models/SkillSection.js";
+
 
 
 const router = Router();
@@ -18,15 +20,16 @@ router.get("/get-protfolio-data", async (req, res) => {
     try {
         const intro = await Intro.findOne();
         const about = await About.findOne();
-        const skills = await Skills.find();
+        const skills = await Skills.find().populate('category');
+        const projectSection = await ProjectSection.findOne();
+        const skillSection = await SkillSection.findOne();
         const projects = await Projects.find();
         const contact = await Contact.findOne();
-        const contactInfo=await ContactInfo.findOne();
         const user = await User.findOne();
         const message = await Message.find();
         const socialLink = await SocialLink.find();
         const coreSkills = await CoreSkills.find();
-        res.send({ intro, about, skills, projects, contact, contactInfo, user, message, socialLink, coreSkills });
+        res.send({ intro, about, skills, projects, projectSection, skillSection, contact, user, message, socialLink, coreSkills });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Internal server error" });

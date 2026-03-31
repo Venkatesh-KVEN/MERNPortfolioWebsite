@@ -27,8 +27,8 @@ function Intro() {
                     </div>
                 </div>
                                     
-                <div className="col-lg-12 mx-auto mt-3">
-                    <p className="fs-6 mb-4 w-50 mx-auto text-center" data-aos="fade-up" data-aos-easing="ease-in-sine">{description}</p>
+                <div className="col-lg-6 col-md-12 col-sm-12 custom-intro-para mx-auto mt-3">
+                    <p className="fs-6 mb-4 mx-auto text-center" data-aos="fade-up" data-aos-easing="ease-in-sine">{description}</p>
                     <div className="d-grid gap-2 d-sm-flex justify-content-sm-center align-items-center">
                         <a href='#projects' className="btn btn-primary btn-sm custom-into-btn py-2" data-aos="zoom-in" data-aos-easing="ease-in-sine">View My Work</a>
                         <div className='social-icons-wrapper'>

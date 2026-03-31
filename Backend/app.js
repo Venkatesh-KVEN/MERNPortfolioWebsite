@@ -31,8 +31,11 @@ import os from 'os';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit'; 
 import contactRoutes from './routes/contact.js';
-import { ContactInfo } from './models/contactInfo.js';
 import Resume from './models/Resume.js';
+import Category from './models/category.js';
+import ProjectSection from './models/ProjectSection.js';
+import SkillSection from './models/SkillSection.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -96,6 +99,7 @@ const uploadFeatureConfig = uploadFeature({
   },
   validation: {
     mimeTypes: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
+     maxSize: 2 * 1024 * 1024, // ✅ 2MB limit
   },
   // This controls the file path - return just filename for flat structure
   uploadPath: (record, filename) => {
@@ -123,10 +127,18 @@ const resumeUploadFeature = uploadFeature({
     key: 'resumeKey',        // 👈 stored filename in DB
     mimeType: 'mimeType',
     size: 'size',
+    filename: 'originalName',
   },
 
   validation: { 
-    mimeTypes: ['application/pdf'],
+    mimeTypes: [
+      'application/pdf', 
+      'application/msword', 
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'image/jpeg',
+      'image/jpg',
+    ],
+    maxSize: 10 * 1024 * 1024,//10MB
   },
 
   uploadPath: (record, filename) => {
@@ -148,13 +160,19 @@ const adminOptions = {
       resource:Intro
     },
     {
+      resource:ProjectSection
+    },
+    {
       resource:Contact
     },
     {
-      resource:ContactInfo
+      resource:CoreSkills
     },
     {
-      resource:CoreSkills
+      resource:Category
+    },
+    {
+      resource:SkillSection
     },
     {
       resource:Skills
@@ -164,23 +182,35 @@ const adminOptions = {
     },
      {
         resource: Resume,
-        options: {
-          properties: {
-            uploadResume: {
-              isVisible: { list: false, show: false, edit: true },
-            },
+       options: {
+      properties: {
+        file: { isVisible: false },
+        resumeKey: { isVisible: false },
+        mimeType: { isVisible: false },
+        size: { isVisible: false },
+        originalName: { isVisible: true } // optional (show in admin)
+      },
 
-            resumeKey: { isVisible: false },
-            mimeType: { isVisible: false },
-            size: { isVisible: false },
-
-            downloadUrl: {
-              isVisible: { list: true, show: true, edit: false },
-            },
-          },
-        },
-
-        // ✅ VERY IMPORTANT
+    // ✅ 👉 ADD HERE
+    actions: {
+      new: {
+        before: async (request) => {
+          if (request?.payload?.uploadResume) {
+            request.payload.originalName = request.payload.uploadResume;
+          }
+          return request;
+        }
+      },
+      edit: {
+        before: async (request) => {
+          if (request?.payload?.uploadResume) {
+            request.payload.originalName = request.payload.uploadResume;
+          }
+          return request;
+        }
+      }
+    }
+  },
         features: [resumeUploadFeature],
     },
     {
@@ -480,7 +510,7 @@ app.use('/api/protfolio', protfolioRouter);
 // 👇 Add rate limiting for contact form
 const contactLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 15, // Limit each IP to 5 requests per windowMs
+  max: 100, // Limit each IP to 5 requests per windowMs
   message: {
     success: false,
     error: 'Too many contact attempts. Please try again after 15 minutes.'

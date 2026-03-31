@@ -22,8 +22,7 @@ const ContactForm = () => {
     });
     
     // FIXED: Added null checks with optional chaining and moved after all hooks
-    const { email: contactEmail, Phone, location } = portfolioData?.contact || {};
-    const { heading, description } = portfolioData?.contactInfo || {};
+    const { email: contactEmail, Phone, location, pageTitle, description, subTitle, content } = portfolioData?.contact || {};
     const { socialLink } = portfolioData || {};
 
     // Validate form
@@ -169,11 +168,11 @@ const ContactForm = () => {
             <div className="container py-lg-5">
                 <div className='row'>
                     <div className="col-lg-12 col-md-12 mx-auto text-center py-5" data-aos="fade-up" data-aos-easing="ease-in-sine">
-                        <h1 className="fw-light text-white" >Get In Touch</h1>
+                        <h1 className="fw-light text-bold" >{pageTitle}</h1>
                         <div className="gradient-bar-contact mt-3"></div> 
                         <p className='mt-4 w-100 w-md-50 w-lg-50 mx-auto'>
                          {
-                            heading || 'heading not provided'
+                            description || 'heading not provided'
                          }
                         </p>
                     </div>
@@ -307,9 +306,9 @@ const ContactForm = () => {
                     {/* Right Column - Contact Info */}
                     <div className="col-md-6">
                         <div className="contact-info h-100" data-aos="zoom-in" data-aos-easing="ease-in-sine">
-                            <h3>Let's Connect</h3>
+                            <h3>{subTitle}</h3>
                             <p className="mb-5 mt-4">
-                                {description || 'description not provided'}
+                                {content || 'description not provided'}
                             </p>
                             
                             <ul className="list-unstyled mb-5">

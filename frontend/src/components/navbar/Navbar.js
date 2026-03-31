@@ -43,27 +43,61 @@ function AppNavbar() {
     window.addEventListener("scroll", changeLogo)
   })
 
-  const downloadResume = async (id) => {
-    try {
-      const res = await axios.get(`/api/resume/download/${id}`, {
-        responseType: 'blob',
-      })
+const downloadResume = async (id) => {
+  try {
+    const res = await axios.get(`/api/resume/download/${id}`, {
+      responseType: 'blob',
+    });
 
-      const url = window.URL.createObjectURL(new Blob([res.data]))
-      const link = document.createElement('a')
-      link.href = url
-      link.download = 'My_Resume.pdf'
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-    } catch (err) {
-     console.error('Download failed', err)
+    // 🔥 Get MIME type
+    const mimeType = res.headers['content-type'];
+
+    // 🔥 Map MIME → extension
+    const mimeToExt = {
+      'application/pdf': 'pdf',
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'application/msword': 'doc',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+    };
+
+    const ext = mimeToExt[mimeType] || 'file';
+
+    // 🔥 Extract original filename (if exists)
+    let fileName = 'resume';
+
+    const disposition = res.headers['content-disposition'];
+    if (disposition) {
+      const match = disposition.match(/filename="?(.+)"?/);
+      if (match?.[1]) {
+        fileName = decodeURIComponent(match[1]);
+      }
+    } else {
+      // fallback
+      fileName = `resume.${ext}`;
     }
+
+    const blob = new Blob([res.data], { type: mimeType });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+
+  } catch (err) {
+    console.error('Download failed', err);
   }
+};
 
    useEffect(() => {
     const fetchResume = async () => {
-      const res = await axios.get('http://localhost:3000/api/resume')
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/resume`)
       setResumeId(res.data?._id)
     }
 
@@ -73,7 +107,7 @@ function AppNavbar() {
    <Navbar key={expand} expand={expand} className={`mb-3 ${navbar ? 'navbar scrolled':'navbar'} navbar-expand-lg navbar-dark fixed-top`} id="main-nav">
       <Container>
         <Navbar.Brand href="#home">   
-        <img src={navbarLogo} alt='KreativeHussain' />
+        <img src={navbarLogo} alt='KreativeHussain' className='img-fluid' />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
         <Navbar.Offcanvas
@@ -93,10 +127,9 @@ function AppNavbar() {
               <Nav.Link href="#skills">Skills</Nav.Link>
               <Nav.Link href="#projects">Projects</Nav.Link>
               <Nav.Link href="#contact">Contact</Nav.Link>
-              <Nav.Link onClick={() => downloadResume(resumeId)}>
+              <Nav.Link onClick={() => downloadResume(resumeId)} className='nav-link custom-resume-link'>
                 <i className="bi bi-download pe-1"></i>Resume
-              </Nav.Link>
-             
+              </Nav.Link>             
               {/* Add more Nav.Link or NavDropdown components as needed */}
             </Nav>
             {/* You can also place forms or other content here */}

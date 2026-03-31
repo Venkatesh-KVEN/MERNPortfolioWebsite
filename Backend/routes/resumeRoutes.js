@@ -12,20 +12,10 @@ const __dirname = path.dirname(__filename)
 // ✅ DOWNLOAD API (SAFE)
 router.get('/download/:id', async (req, res) => {
   try {
-    const resume = await Resume.findById(req.params.id)
-
-    console.log("👉 Resume:", resume)
+    const resume = await Resume.findById(req.params.id);
 
     if (!resume) {
-      return res.status(404).json({ message: 'Resume not found' })
-    }
-
-    const fileName = resume.resumeKey
-
-    console.log("👉 fileName:", fileName)
-
-    if (!fileName) {
-      return res.status(400).json({ message: 'File not stored in DB' })
+      return res.status(404).json({ message: 'Resume not found' });
     }
 
     const filePath = path.join(
@@ -34,26 +24,31 @@ router.get('/download/:id', async (req, res) => {
       'public',
       'uploads',
       'resumes',
-      fileName
-    )
+      resume.resumeKey
+    );
 
-    console.log("👉 filePath:", filePath)
-
-    // ✅ Check file exists
     if (!fs.existsSync(filePath)) {
-      return res.status(404).json({
-        message: 'File not found on server',
-        path: filePath
-      })
+      return res.status(404).json({ message: 'File not found' });
     }
 
-    res.download(filePath)
+    const fileName = resume.originalName || resume.resumeKey;
+
+    // ✅ FIXED HEADER
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${fileName}"`
+    );
+
+    res.setHeader('Content-Type', resume.mimeType);
+
+    return res.sendFile(filePath);
 
   } catch (err) {
-    console.error("❌ DOWNLOAD ERROR:", err)
-    res.status(500).json({ error: err.message })
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
-})
+});
+
 
 router.get('/', async (req, res) => {
   try {
