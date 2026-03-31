@@ -8,8 +8,6 @@ const LatestProjects = () => {
     const { portfolioData } = useSelector((state) => state.root);
       const { pageTitle, description, subTitle } =
          portfolioData?.projectSection || {};
-
-        console.log(portfolioData?.projectSection);
     
     if (!portfolioData || !portfolioData.projects) {
         return (
