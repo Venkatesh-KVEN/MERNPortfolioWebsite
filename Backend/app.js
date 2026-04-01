@@ -54,9 +54,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, 'public', 'uploads');
+const uploadsDir = path.join(__dirname, 'public', 'uploads', 'core-icons');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
+}
+// Create uploads directory if it doesn't exist
+const iconDir = path.join(__dirname, 'public', 'uploads','');
+if (!fs.existsSync(iconDir)) {
+  fs.mkdirSync(iconDir, { recursive: true });
 }
 
 // Resume subfolder
@@ -81,7 +86,7 @@ mongoose.connect(process.env.MONGODB_URI)
 // // Initialize ComponentLoader
 // const componentLoader = new ComponentLoader();
 
-// Configure upload feature
+// Configure upload image feature
 const uploadFeatureConfig = uploadFeature({
   componentLoader,
   provider: {
@@ -99,6 +104,37 @@ const uploadFeatureConfig = uploadFeature({
   },
   validation: {
     mimeTypes: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
+     maxSize: 2 * 1024 * 1024, // ✅ 2MB limit
+  },
+  // This controls the file path - return just filename for flat structure
+  uploadPath: (record, filename) => {
+    // Generate unique filename while preserving extension
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 15);
+    const extension = filename.substring(filename.lastIndexOf('.'));
+    return `${timestamp}-${randomString}${extension}`;
+  },
+});
+
+
+// Configure upload icon image feature
+const coreSkillIconUpload  = uploadFeature({
+  componentLoader,
+  provider: {
+    local: {
+      bucket: path.join(__dirname, 'public','uploads/core-icons'),
+      opts: { baseUrl: '/uploads/core-icons' },
+    },
+  },
+  properties: {
+    file: 'iconUpload ',
+    key: 'iconImageKey',
+    mimeType: 'iconImageMimeType',
+    size: 'iconImageSize',
+    bucket: 'iconImageBucket',
+  },
+  validation: {
+    mimeTypes: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/svg+xml'],
      maxSize: 2 * 1024 * 1024, // ✅ 2MB limit
   },
   // This controls the file path - return just filename for flat structure
@@ -166,7 +202,22 @@ const adminOptions = {
       resource:Contact
     },
     {
-      resource:CoreSkills
+      resource: CoreSkills,
+         options: {
+        properties: {
+          iconImageKey: { 
+            isVisible: { list: false, show: false, edit: false },
+            position: 2,
+          },
+          iconImageMimeType: { 
+            isVisible: { list: false, show: false, edit: false } 
+          },
+          iconImageSize: { 
+            isVisible: { list: false, show: true, edit: false } 
+          },
+        },
+      },
+      features: [coreSkillIconUpload],
     },
     {
       resource:Category
@@ -178,7 +229,8 @@ const adminOptions = {
       resource:Skills
     },
     {
-      resource:SocialLink
+      resource:SocialLink,
+      
     },
      {
         resource: Resume,

@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 
 
 const coreSkillsSchema = new mongoose.Schema({
-    icon: { type: String, required: true },
+    icon: { type: String },
+    iconImageKey: String,
+    iconImageMimeType: String,
+    iconImageSize: Number,
     title: { type: String, required: true },
     description: { type: String, required: true },
 })

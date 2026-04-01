@@ -9,6 +9,24 @@ const About = () => {
   const { title, heading, description, content, skills, } = about || {};
   const skill = skills|| [];
   const { coreSkills } = portfolioData;
+  const CoreSkillIcon = ({ item }) => {
+  if (item.iconImageKey) {
+    return (
+      <img
+        src={`/uploads/core-icons/${item.iconImageKey}`}
+        alt={item.title}
+        style={{ width: 40, height: 40 }}
+      />
+    );
+  }
+
+  if (item.icon) {
+    return <i className={`be bi-${item.icon} fs-5`}></i>;
+     
+  }
+
+  return null;
+};
   return (
     <div className='container-fluid about-bg pb-5'>
       <div className="container py-4" id="about">
@@ -38,13 +56,13 @@ const About = () => {
           <div className='col-md-6 about-cards'>
             <div className="row">
               {
-                coreSkills?.map((item, index) => (
+                coreSkills?.map((item) => (
                   
-                  <div key={index} className="col-md-6 mb-4" data-aos="fade-up" data-aos-easing="ease-in-sine">
+                  <div key={item._id} className="col-md-6 mb-4" data-aos="fade-up" data-aos-easing="ease-in-sine">
                     <div className="about-card h-100 p-2">
                       <div className="card-body ">
                         <p className='mb-3 about-icon'>
-                          <i className={`be bi-${item.icon} fs-5`}></i>
+                           <CoreSkillIcon item={item} />
                         </p>
                         <h3 className="card-title my-4">{item.title}</h3>
                         <p className="card-text">{item.description}</p>
