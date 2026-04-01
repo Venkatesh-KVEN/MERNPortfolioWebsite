@@ -88,7 +88,7 @@ const LatestProjects = () => {
                     </div>
 
                     {/* Other Projects Section */}
-                    <h3 className="fw-bold pt-lg-5 pt-md-5 mt-5 text-center" data-aos="fade-up">{subTitle}</h3>
+                    <h3 className="fw-light pt-lg-5 pt-md-5 mt-5 text-center" data-aos="fade-up">{subTitle}</h3>
                     <div className="mt-2 row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 pb-3">
                         {itemsToShow.map((project, index) => (
                             <div key={project._id || index} className="col d-flex align-items-stretch">

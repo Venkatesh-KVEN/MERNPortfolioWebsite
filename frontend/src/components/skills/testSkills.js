@@ -61,13 +61,19 @@ const CategorizedList = () => {
 
   return (
     <div className='container-fluid skills-bg text-white py-5' id="skills">
+      <section className="text-center container text-white" id="projects">
+                <div className="row py-lg-5 py-md-5 py-sm-5 py-5">
+                    <div className="col-lg-6 col-md-8 mx-auto">
+                        <h1 className="fw-light" data-aos="fade-up" data-aos-easing="ease-in-sine">{pageTitle}</h1>
+                        <div className="gradient-bar-skills mt-3" data-aos="fade-up" data-aos-easing="ease-in-sine"></div>
+                        <p className="lead text-white mt-5" data-aos="fade-up" data-aos-easing="ease-in-sine">
+                            {description}
+                        </p>
+                    </div>
+                </div>
+       </section>
       <div className="container">
         
-        <div className='text-center mb-5'>
-          <h1>{pageTitle}</h1>
-          <p>{description}</p>
-        </div>
-
         {/* Dynamic Categories */}
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
             {Object.entries(groupedSkills || {}).map(([categoryName, items], index) => (
