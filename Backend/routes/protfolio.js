@@ -16,7 +16,7 @@ import SkillSection from "../models/SkillSection.js";
 
 const router = Router();
 
-router.get("/get-protfolio-data", async (req, res) => {
+router.get("/get-portfolio-data", async (req, res) => {
     try {
         const intro = await Intro.findOne();
         const about = await About.findOne();

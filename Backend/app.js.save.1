@@ -1,0 +1,591 @@
+	import express from 'express';
+	import mongoose from 'mongoose';
+	import session from 'express-session';
+	import AdminJS from 'adminjs';
+	const actions = AdminJS.actions;
+	import AdminJSExpress from '@adminjs/express';
+	import * as uploadFeature from '@adminjs/upload';
+	import * as AdminJSMongoose from '@adminjs/mongoose';
+	import User from './models/User.js';
+	import { About } from './models/about.js';
+	import {Contact} from './models/contact.js';
+	import {Intro} from './models/intro.js';
+	import {Skills} from './models/skills.js';
+	import {SocialLink} from './models/SocialLinks.js';
+	import {CoreSkills} from './models/coreSkills.js';
+	import dotenv from 'dotenv';
+	import bcrypt from 'bcrypt';
+	dotenv.config();  
+
+
+	import Projects from './models/Porjects.js';
+	import authRoutes from './routes/authRoutes.js';
+	import projectOrderRouter from './routes/admin.routes.js';
+	import protfolioRouter from './routes/protfolio.js';
+	import resumeRoutes from './routes/resumeRoutes.js';
+
+	import path from 'path';
+	import fs from 'fs';
+	import { fileURLToPath } from 'url';
+	import os from 'os';
+	import cors from 'cors';
+	import rateLimit from 'express-rate-limit'; 
+	import contactRoutes from './routes/contact.js';
+	import Resume from './models/Resume.js';
+	import Category from './models/category.js';
+	import ProjectSection from './models/ProjectSection.js';
+	import SkillSection from './models/SkillSection.js';
+
+
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = path.dirname(__filename);
+	const uploadTempDir = path.join('E:\\giri\\portal\\Portfolio\\temp');
+	if (!fs.existsSync(uploadTempDir)) {
+	  fs.mkdirSync(uploadTempDir, { recursive: true });
+	}
+
+	// Override the temp directory
+	os.tmpdir = () => uploadTempDir;
+	process.env.TMPDIR = uploadTempDir;
+	process.env.TEMP = uploadTempDir;
+	process.env.TMP = uploadTempDir;
+
+	const app = express();
+	const PORT = process.env.PORT || 3000;
+
+	// Create uploads directory if it doesn't exist
+	const uploadsDir = path.join(__dirname, 'public', 'uploads', 'core-icons');
+	if (!fs.existsSync(uploadsDir)) {
+	  fs.mkdirSync(uploadsDir, { recursive: true });
+	}
+	// Create uploads directory if it doesn't exist
+	const iconDir = path.join(__dirname, 'public', 'uploads','');
+	if (!fs.existsSync(iconDir)) {
+	  fs.mkdirSync(iconDir, { recursive: true });
+	}
+
+	// Resume subfolder
+	// Resume subfolder
+	const resumeDir = path.join(__dirname, 'public', 'uploads', 'resumes');
+
+	if (!fs.existsSync(resumeDir)) {
+	  fs.mkdirSync(resumeDir, { recursive: true });
+	}
+
+	// Register AdminJS adapter for Mongoose
+	AdminJS.registerAdapter({
+	  Resource: AdminJSMongoose.Resource,
+	  Database: AdminJSMongoose.Database,
+	});
+
+	// Connect to MongoDB
+	mongoose.connect(process.env.MONGODB_URI)
+	  .then(() => console.log('✅ Connected to MongoDB'))
+	  .catch(err => console.error('❌ MongoDB connection error:', err));
+
+	// // Initialize ComponentLoader
+	// const componentLoader = new ComponentLoader();
+
+	// Configure upload image feature
+	const uploadFeatureConfig = uploadFeature({
+	  componentLoader,
+	  provider: {
+	    local: {
+	m4M?t.tvhijY0e0TJ+r#      bucket: path.join(__dirname, 'public','uploads'),
+	      opts: { baseUrl: '/uploads' },
+	    },
+	  },
+	  properties: {
+	    file: 'image',
+	    key: 'imageKey',
+	    mimeType: 'imageMimeType',
+	    size: 'imageSize',
+	    bucket: 'imageBucket',
+	  },
+	  validation: {
+	    mimeTypes: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
+	     maxSize: 2 * 1024 * 1024, // ✅ 2MB limit
+	  },
+	  // This controls the file path - return just filename for flat structure
+	  uploadPath: (record, filename) => {
+	    // Generate unique filename while preserving extension
+	    const timestamp = Date.now();
+	    const randomString = Math.random().toString(36).substring(2, 15);
+	    const extension = filename.substring(filename.lastIndexOf('.'));
+	    return `${timestamp}-${randomString}${extension}`;
+	  },
+	});
+
+
+	// Configure upload icon image feature
+	const coreSkillIconUpload  = uploadFeature({
+	  provider: {
+	    local: {
+	      bucket: path.join(__dirname, 'public','uploads/core-icons'),
+	      opts: { baseUrl: '/uploads/core-icons' },
+	    },
+	  },
+	  properties: {
+	    file: 'iconUpload ',
+	    key: 'iconImageKey',
+	    mimeType: 'iconImageMimeType',
+	    size: 'iconImageSize',
+	    bucket: 'iconImageBucket',
+	  },
+	  validation: {
+	    mimeTypes: ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/svg+xml'],
+	     maxSize: 2 * 1024 * 1024, // ✅ 2MB limit
+	  },
+	  // This controls the file path - return just filename for flat structure
+	  uploadPath: (record, filename) => {
+	    // Generate unique filename while preserving extension
+	    const timestamp = Date.now();
+	    const randomString = Math.random().toString(36).substring(2, 15);
+	    const extension = filename.substring(filename.lastIndexOf('.'));
+	    return `${timestamp}-${randomString}${extension}`;
+	  },
+	});
+
+	//resume upload configure
+	const resumeUploadFeature = uploadFeature({
+	  provider: {
+	    local: {
+	      bucket: path.join(__dirname, 'public', 'uploads', 'resumes'),
+	      opts: { baseUrl: '/uploads/resumes' },
+	    },
+	  },
+
+	  // ✅ YOUR CODE GOES HERE
+	  properties: {
+	    file: 'uploadResume',   // 👈 this creates upload field in AdminJS
+	    key: 'resumeKey',        // 👈 stored filename in DB
+	    mimeType: 'mimeType',
+	    size: 'size',
+	    filename: 'originalName',
+	  },
+
+	  validation: { 
+	    mimeTypes: [
+	      'application/pdf', 
+	      'application/msword', 
+	      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+	      'image/jpeg',
+	      'image/jpg',
+	    ],
+	    maxSize: 10 * 1024 * 1024,//10MB
+	  },
+
+	  uploadPath: (record, filename) => {
+	    const timestamp = Date.now()
+	    const random = Math.random().toString(36).substring(2, 10)
+	    const ext = filename.substring(filename.lastIndexOf('.'))
+	    return `${timestamp}-${random}${ext}`
+	  },
+	})
+
+	// Configure AdminJS options
+	const adminOptions = {
+	  resources: [
+	    {
+	      resource:About
+	    },
+	    {
+	      resource:Intro
+	    },
+	    {
+	      resource:ProjectSection
+	    },
+	    {
+	      resource:Contact
+	    },
+	    {
+	      resource: CoreSkills,
+	         options: {
+	        properties: {
+	          iconImageKey: { 
+	            isVisible: { list: false, show: false, edit: false },
+	            position: 2,
+	          },
+	          iconImageMimeType: { 
+	            isVisible: { list: false, show: false, edit: false } 
+	          },
+	          iconImageSize: { 
+	            isVisible: { list: false, show: true, edit: false } 
+	          },
+	        },
+	      },
+	      features: [coreSkillIconUpload],
+	    },
+	    {
+	      resource:Category
+	    },
+	    {
+	      resource:SkillSection
+	    },
+	    {
+	      resource:Skills
+	    },
+	    {
+	      resource:SocialLink,
+	      
+	    },
+	     {
+	        resource: Resume,
+	       options: {
+	      properties: {
+	        file: { isVisible: false },
+	        resumeKey: { isVisible: false },
+	        mimeType: { isVisible: false },
+	        size: { isVisible: false },
+	        originalName: { isVisible: true } // optional (show in admin)
+	      },
+
+	    // ✅ 👉 ADD HERE
+	    actions: {
+	      new: {
+	        before: async (request) => {
+	          if (request?.payload?.uploadResume) {
+	            request.payload.originalName = request.payload.uploadResume;
+	          }
+	          return request;
+	        }
+	      },
+	      edit: {
+	        before: async (request) => {
+	          if (request?.payload?.uploadResume) {
+	            request.payload.originalName = request.payload.uploadResume;
+	          }
+	          return request;
+	        }
+	      }
+	    }
+	  },
+	        features: [resumeUploadFeature],
+	    },
+	    {
+	      resource: Projects,
+	      options: {
+	        properties: {
+	          imageKey: { 
+	            isVisible: { list: false, show: true, edit: false },
+	            position: 2,
+	          },
+	          imageMimeType: { 
+	            isVisible: { list: false, show: true, edit: false } 
+	          },
+	          imageSize: { 
+	            isVisible: { list: false, show: true, edit: false } 
+	          },
+	        },
+	        sort:{
+	          sortBy:'order',
+	          direction:'asc'
+	        },
+	        actions:{
+	          list: {
+	          component: 'DraggableList',
+	      },
+	        }
+	      },
+	      features: [uploadFeatureConfig],
+	    },
+	    {
+	      resource: User,
+	      options: {
+	        properties: {
+	          password: {
+	            isVisible: { list: false, filter: false, show: false, edit: true },
+	            type: 'password',
+	          },
+	          createdAt: {
+	            isVisible: { list: true, filter: true, show: true, edit: false },
+	          },
+	        },
+	        actions: {
+	          toggleActive: {
+	            actionType: 'record',
+	            icon: 'Toggle',
+	            handler: async (request, response, context) => {
+	              const { record, resource } = context;
+	              const currentStatus = record.param('isActive');
+	              await resource.update(record.id(), { isActive: !currentStatus });
+	              return {
+	                record: record.toJSON(context.currentAdmin),
+	                notice: {
+	                  message: `User ${record.param('name')} active status toggled successfully!`,
+	                  type: 'success',
+	                },
+	              };
+	            },
+	            component: false,
+	          },
+	        },
+	      },
+	    },
+	  ],
+	  rootPath: '/admin',
+	  branding: {
+	    companyName: 'Kreative Hussain Dashboard',
+	    softwareBrothers: false,
+	    logo: false,
+	  },
+	};
+
+
+	// Initialize AdminJS
+	const admin = new AdminJS(adminOptions);
+
+	// Enable AdminJS watch mode in development
+	if (process.env.NODE_ENV === 'development') {
+	  admin.watch();
+	}
+
+	// IMPORTANT: Order of middleware matters!
+	app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
+	// Session configuration (needed for AdminJS)
+	const sessionConfig = {
+	  secret: process.env.COOKIE_PASSWORD || 'your-fallback-secret-key-for-development',
+	  resave: true,
+	  saveUninitialized: false,
+	  cookie: {
+	    httpOnly: true,
+	    secure: process.env.NODE_ENV === 'production',
+	    maxAge: 24 * 60 * 60 * 1000,
+	  },
+	  name: 'adminjs',
+	};
+
+	// Apply session middleware
+	app.use(session(sessionConfig));
+
+	// Authentication
+	const authenticate  = async (email, password)=>{
+
+	  const user=await User.findOne({email})
+	  if(user){
+	    const matched=await bcrypt.compare(password, user.password);
+	    if(matched){
+	      return{
+	        email:user.email, 
+	        role:user.role,
+	        _id:user._id
+	      }
+	    }
+	  }
+	  return null;
+	}
+
+	// Build and use AdminJS router (this must come BEFORE body-parser)
+	const adminRouter = AdminJSExpress.buildAuthenticatedRouter(
+	  admin,
+	  {
+	    authenticate,
+	    cookieName:'adminjs',
+	    cookiePassword:process.env.COOKIE_PASSWORD
+
+	  },
+	  null,
+	  sessionConfig
+	);
+
+	app.use(admin.options.rootPath, adminRouter);
+
+	// NOW it's safe to add body-parser/express.json middleware AFTER AdminJS router
+	app.set('trust proxy', 1);
+	app.use(cors({origin:'*'}));
+	app.use(express.json());
+	app.use(express.urlencoded({ extended: true }));
+
+	// Auth routes (separate from AdminJS)
+	app.use('/api/auth', authRoutes);
+	app.use('/project/order', projectOrderRouter);
+	app.use('/api/resume', resumeRoutes);
+
+	app.delete('/api/project/:id', async (req, res) => {
+	  try {
+	    const deleted = await Projects.findByIdAndDelete(req.params.id);
+
+	    if (!deleted) {
+	      return res.status(404).json({ success: false, message: 'Project not found' });
+	    }
+
+	    res.json({ success: true, message: 'Deleted successfully' });
+	  } catch (error) {
+	    console.error(error);
+	    res.status(500).json({ success: false });
+	  }
+	});
+
+	// Regular routes come after body-parser
+	app.get('/', (req, res) => {
+	  res.send(`
+	    <html>
+	      <head>
+	        <title>AdminJS MongoDB Dashboard</title>
+	        <style>
+	          body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+	          .container { max-width: 800px; margin: 0 auto; }
+	          h1 { color: #333; }
+	          a { color: #0066cc; text-decoration: none; }
+	          a:hover { text-decoration: underline; }
+	          .button { 
+	            display: inline-block; 
+	            background: #0066cc; 
+	            color: white; 
+	            padding: 10px 20px; 
+	            border-radius: 5px;
+	            margin-top: 20px;
+	          }
+	          .button:hover { background: #0052a3; text-decoration: none; }
+	        </style>
+	      </head>
+	      <body>
+	        <div class="container">
+	          <h1>Welcome to AdminJS MongoDB Dashboard</h1>
+	          <p>Your admin dashboard is ready to use!</p>
+	          <p>Login credentials:</p>
+	          <ul>
+	            <li><strong>Email:</strong> admin@example.com</li>
+	            <li><strong>Password:</strong> password</li>
+	          </ul>
+	          <a href="/admin" class="button">Go to Admin Dashboard</a>
+	        </div>
+	      </body>
+	    </html>
+	  `); 
+	});
+
+	// Add this after your other middleware
+	// Serve static HTML for reset password page (optional)
+	app.get('/reset-password/:token', (req, res) => {
+	  res.send(`
+	    <!DOCTYPE html>
+	    <html>
+	    <head>
+	      <title>Reset Password :: Kreative Hussain Dashboard</title>
+	      <style>
+	        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f0f2f5; }
+	        .container { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+	        h2 { margin-bottom: 20px; color: #333; }
+	        .form-group { margin-bottom: 20px; }
+	        label { display: block; margin-bottom: 5px; color: #555; }
+	        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+	        button { background: #00bc7d; color: white; padding: 12px; border: none; border-radius: 4px; width: 100%; cursor: pointer; font-size: 16px; }
+	        button:hover { background: oklch(.707 .165 254.624); }
+	        .message { margin-top: 15px; padding: 10px; border-radius: 4px; display: none; }
+	        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+	        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+	      </style>
+	    </head>
+	    <body>
+	      <div class="container">
+	        <h2>Reset Your Password</h2>
+	        <form id="resetForm">
+	          <div class="form-group">
+	            <label for="password">New Password</label>
+	            <input type="password" id="password" name="password" required minlength="6">
+	          </div>
+	          <div class="form-group">
+	            <label for="confirmPassword">Confirm Password</label>
+	            <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+	          </div>
+	          <button type="submit">Reset Password</button>
+	          <div id="message" class="message"></div>
+	        </form>
+	      </div>
+
+	      <script>
+	        document.getElementById('resetForm').addEventListener('submit', async (e) => {
+	          e.preventDefault();
+	          
+	          const token = window.location.pathname.split('/').pop();
+	          const password = document.getElementById('password').value;
+	          const confirmPassword = document.getElementById('confirmPassword').value;
+	          const messageDiv = document.getElementById('message');
+	          
+	          try {
+	            const response = await fetch('/api/auth/reset-password/' + token, {
+	              method: 'POST',
+	              headers: {
+	                'Content-Type': 'application/json',
+	              },
+	              body: JSON.stringify({ password, confirmPassword })
+	            });
+	            
+	            const data = await response.json();
+	            
+	            messageDiv.style.display = 'block';
+	            
+	            if (data.success) {
+	              messageDiv.className = 'message success';
+	              messageDiv.textContent = data.message;
+	              
+	              // Redirect to admin login after 3 seconds
+	              setTimeout(() => {
+	                window.location.href = '/admin/login';
+	              }, 3000);
+	            } else {
+	              messageDiv.className = 'message error';
+	              messageDiv.textContent = data.message;
+	            }
+	          } catch (error) {
+	            messageDiv.style.display = 'block';
+	            messageDiv.className = 'message error';
+	            messageDiv.textContent = 'An error occurred. Please try again.';
+	          }
+	        });
+	      </script>
+	    </body>
+	    </html>
+	  `);
+	});
+
+
+
+	// 7. Error handling middleware (always last)
+	app.use((err, req, res, next) => {
+	  console.error('❌ Error:', err);
+	  res.status(500).json({ 
+	    error: 'Something went wrong!',
+	    message: err.message 
+	  });
+	});
+
+	//get all data for frontend
+	app.use('/api/protfolio', protfolioRouter);
+
+
+	// 👇 Add rate limiting for contact form
+	const contactLimiter = rateLimit({
+	  windowMs: 15 * 60 * 1000, // 15 minutes
+	  max: 100, // Limit each IP to 5 requests per windowMs
+	  message: {
+	    success: false,
+	    error: 'Too many contact attempts. Please try again after 15 minutes.'
+	  },
+	    keyGenerator: (req) => {
+	    // Try to get the real IP from the X-Forwarded-For header
+	    const forwardedFor = req.headers['x-forwarded-for'];
+	    if (forwardedFor) {
+	      // The header can be a comma-separated list; the leftmost is the original client
+	      const clientIp = forwardedFor.split(',')[0].trim();
+	      return clientIp;
+	    }
+	    // Fallback to the default remote address
+	    return req.socket.remoteAddress;
+	  },
+	  standardHeaders: true, // Return rate limit info in headers
+	  legacyHeaders: false, // Disable the X-RateLimit-* headers
+	});
+	// contact form routes
+	app.use('/',contactLimiter, contactRoutes);
+
+	// Start server
+	app.listen(PORT, () => {
+	  console.log(`🚀 Server started on http://localhost:${PORT}`);
+	  console.log(`📊 AdminJS dashboard available at http://localhost:${PORT}${admin.options.rootPath}`);
+	  console.log(`🔑 Login with: admin@example.com / password`);
+	  console.log(`📁 Uploads directory: ${uploadsDir}`);
+	});
+	ss -lntp | grep node

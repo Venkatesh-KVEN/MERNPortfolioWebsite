@@ -1,11 +1,5 @@
-import path from  'path'
-import { ComponentLoader } from 'adminjs'
+import { ComponentLoader } from 'adminjs';
 
-const componentLoader = new ComponentLoader()
+const componentLoader = new ComponentLoader();
 
-componentLoader.add(
-  'DraggableList',
-  path.join(process.cwd(), 'admin/components/DraggableList')
-)
-
-export default componentLoader
+export default componentLoader;

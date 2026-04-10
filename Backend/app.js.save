@@ -4,8 +4,7 @@ import session from 'express-session';
 import AdminJS from 'adminjs';
 const actions = AdminJS.actions;
 import AdminJSExpress from '@adminjs/express';
-import uploadFeature from '@adminjs/upload'
-
+import uploadFeature from '@adminjs/upload';
 import * as AdminJSMongoose from '@adminjs/mongoose';
 import User from './models/User.js';
 import { About } from './models/about.js';
@@ -18,13 +17,14 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 dotenv.config();  
 
-import componentLoader from './admin/component-loader.js';
+
 import Projects from './models/Porjects.js';
 import authRoutes from './routes/authRoutes.js';
 import projectOrderRouter from './routes/admin.routes.js';
 import protfolioRouter from './routes/protfolio.js';
 import resumeRoutes from './routes/resumeRoutes.js';
 
+import {componentLoader} from './admin/component-loader.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -55,7 +55,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, 'public', 'uploads', 'core-icons');
+const uploadsDir = path.join(__dirname, 'public', '
+uploads', 'core-icons');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
@@ -92,7 +93,7 @@ const uploadFeatureConfig = uploadFeature({
   componentLoader,
   provider: {
     local: {
-bucket: path.join(__dirname, 'public','uploads'),
+      bucket: path.join(__dirname, 'public','uploads'),
       opts: { baseUrl: '/uploads' },
     },
   },
@@ -120,7 +121,7 @@ bucket: path.join(__dirname, 'public','uploads'),
 
 // Configure upload icon image feature
 const coreSkillIconUpload  = uploadFeature({
- componentLoader,
+  componentLoader,
   provider: {
     local: {
       bucket: path.join(__dirname, 'public','uploads/core-icons'),
@@ -150,7 +151,7 @@ const coreSkillIconUpload  = uploadFeature({
 
 //resume upload configure
 const resumeUploadFeature = uploadFeature({
- componentLoader,
+  componentLoader,
   provider: {
     local: {
       bucket: path.join(__dirname, 'public', 'uploads', 'resumes'),
@@ -188,7 +189,7 @@ const resumeUploadFeature = uploadFeature({
 
 // Configure AdminJS options
 const adminOptions = {
- componentLoader,
+  componentLoader,
   resources: [
     {
       resource:About
@@ -557,7 +558,7 @@ app.use((err, req, res, next) => {
 });
 
 //get all data for frontend
-app.use('/api/portfolio', protfolioRouter);
+app.use('/api/protfolio', protfolioRouter);
 
 
 // 👇 Add rate limiting for contact form
@@ -586,4 +587,9 @@ const contactLimiter = rateLimit({
 app.use('/',contactLimiter, contactRoutes);
 
 // Start server
-app.listen(process.env.PORT || 5000, '0.0.0.0', () => console.log('listening'));
+app.listen(PORT, () => {
+  console.log(`🚀 Server started on http://localhost:${PORT}`);
+  console.log(`📊 AdminJS dashboard available at http://localhost:${PORT}${admin.options.rootPath}`);
+  console.log(`🔑 Login with: admin@example.com / password`);
+  console.log(`📁 Uploads directory: ${uploadsDir}`);
+});

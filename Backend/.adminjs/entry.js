@@ -1,6 +1,4 @@
 AdminJS.UserComponents = {}
-import DraggableList from '../admin/components/DraggableList'
-AdminJS.UserComponents.DraggableList = DraggableList
 import UploadEditComponent from '../node_modules/@adminjs/upload/build/features/upload-file/components/UploadEditComponent'
 AdminJS.UserComponents.UploadEditComponent = UploadEditComponent
 import UploadListComponent from '../node_modules/@adminjs/upload/build/features/upload-file/components/UploadListComponent'
